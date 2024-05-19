@@ -1,7 +1,7 @@
 const { ethers } = require('ethers');
 
-// const apiURL = "http://localhost:3001"
-const apiURL = "http://liquicert.io"
+const apiURL = "http://localhost:3001"
+// const apiURL = "http://liquicert.io"
 
 class Liquicert {
     constructor(provider, wallet) {
@@ -58,8 +58,19 @@ class Liquicert {
         console.log('attesting')
     }
 
-    async findPath(src, target) {
-        console.log('searching for path')
+    async findPath(srcCommunityAddress, targetDataCID) {
+        try {
+            const queryString = `${apiURL}/findTrustPaths?communitySrc=${srcCommunityAddress}&dataTarget=${targetDataCID}`;
+            const res = await fetch(queryString);
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.error.message || 'Failed to find path.');
+            }
+            const data = await res.json();
+            return data;
+        } catch (error) {
+            console.error("Error:", error.message);
+        }        
     }
 }
 
