@@ -1,6 +1,6 @@
 {
   "name": "js-liquicert",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Javascript sdk for interacting with Liquicert",
   "main": "index.js",
   "scripts": {
