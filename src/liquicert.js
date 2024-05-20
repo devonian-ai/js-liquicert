@@ -13,6 +13,7 @@ class Liquicert {
         console.log('uploading')
     }
 
+    // Makes a simple attestation by signing the dataCID
     async createAttestation(attestationName, dataCID, attestationDescription, trustedBool, contractAddress = 'default_sepolia_contract', network = 'sepolia') {
 
         // Make sure we have all the required inputs
@@ -58,6 +59,8 @@ class Liquicert {
         console.log('attesting')
     }
 
+    // Takes an ethereum address of a community, and the CID of a target dataset
+    // Returns an array of objects, where each object is a valid trust path
     async findPath(srcCommunityAddress, targetDataCID) {
         try {
             const queryString = `${apiURL}/findTrustPaths?communitySrc=${srcCommunityAddress}&dataTarget=${targetDataCID}`;
@@ -73,6 +76,8 @@ class Liquicert {
         }        
     }
 
+    // Takes JSON object of a valid trust path, saves it
+    // Returns the trust path's CID as a string
     async savePath(pathDataJSON) {
         try {
             const response = await fetch(`${apiURL}/savePath`, {
@@ -88,11 +93,37 @@ class Liquicert {
             }
     
             const data = await response.json();
-            return data;  // Assuming the API returns a string
+            return data; 
     
         } catch (error) {
             console.error("Error:", error.message);
-            throw error;  // Re-throw the error to be handled by the caller
+            throw error; 
+        }
+    }    
+
+    // Takes data and pins it to ipfs
+    // Returns the data's CID as a string; access at https://CID.ipfs.w3s.link/
+    // If you're passing JSON data, stringify it first
+    async saveData(dataToSave) {
+        try {
+            const response = await fetch(`${apiURL}/saveData`, {
+                method: "POST",
+                body: JSON.stringify({ "proofPath": dataToSave }),
+                headers: { "Content-type": "application/json; charset=UTF-8" }
+            });
+    
+            // Handle errors from the API
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error.message || 'Failed to pin data.');
+            }
+    
+            const data = await response.json();
+            return data;  
+    
+        } catch (error) {
+            console.error("Error:", error.message);
+            throw error;
         }
     }    
 }
