@@ -1,7 +1,7 @@
 const { ethers } = require('ethers');
 
-const apiURL = "http://localhost:3001"
-// const apiURL = "http://liquicert.io"
+// const apiURL = "http://localhost:3001"
+const apiURL = "http://liquicert.io"
 
 class Liquicert {
     constructor(provider, wallet) {
@@ -72,6 +72,29 @@ class Liquicert {
             console.error("Error:", error.message);
         }        
     }
+
+    async savePath(pathDataJSON) {
+        try {
+            const response = await fetch(`${apiURL}/savePath`, {
+                method: "POST",
+                body: JSON.stringify({ "proofPath": JSON.stringify(pathDataJSON) }),
+                headers: { "Content-type": "application/json; charset=UTF-8" }
+            });
+    
+            // Handle errors from the API
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error.message || 'Failed to save path.');
+            }
+    
+            const data = await response.json();
+            return data;  // Assuming the API returns a string
+    
+        } catch (error) {
+            console.error("Error:", error.message);
+            throw error;  // Re-throw the error to be handled by the caller
+        }
+    }    
 }
 
 module.exports = Liquicert;
